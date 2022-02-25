@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const axios = require("axios");
 
 
@@ -15,17 +15,33 @@ app.listen(port, () => {
 
 // Create connection to MySql
 const con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "gasInformation"
+    host: "mysql_server",
+    user: "dan",
+    password: "secret",
+    database: "test_db"
 });
 
 
-// Connect and create a database
+// Connect
+
 con.connect(function(err) {
     if (err) throw err;
     console.log("Connected!");
+});
+
+// Create a table
+const sql = `
+CREATE TABLE IF NOT EXISTS gastracker (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    blockNum INT,
+    fast INT,
+    average INT,
+    low INT,
+    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=INNODB;`;
+con.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log("Table created");
 });
 
 
@@ -38,7 +54,7 @@ const url = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&api
 setInterval(() => {
     axios.get(url).then(response => {
         let info = response.data.result;
-        let sqlRow = `INSERT INTO gastracker (block, fast, average, low) VALUES ('${info.LastBlock}','${info.FastGasPrice}','${info.ProposeGasPrice}','${info.SafeGasPrice}')`;
+        let sqlRow = `INSERT INTO gastracker (blockNum, fast, average, low) VALUES ('${info.LastBlock}','${info.FastGasPrice}','${info.ProposeGasPrice}','${info.SafeGasPrice}')`;
         con.query(sqlRow, function (err, result) {
             if (err) throw err;
             console.log(`Row inserted at ${Date.now()}`);
@@ -47,7 +63,7 @@ setInterval(() => {
     .catch(error => {
         console.log(error);
     });
-}, 300);
+}, 500);
 
 // API call for gas
 app.get('/gas', (req, res) => {
