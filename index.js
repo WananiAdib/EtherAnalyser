@@ -44,8 +44,8 @@ con.query(sql, function (err, result) {
 });
 
 // Receive data from Etherscan
-const apiKeyToken = "ZWD4KRWG83DRYS8ENYUPUJZQP326KQRJNM";
-const url = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${apiKeyToken}`
+const config = require('./config.js')
+const url = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${config.apiKeyToken}`
 
 // Storing the data on the database every 500ms
 setInterval(() => {
