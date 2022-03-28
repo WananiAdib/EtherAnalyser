@@ -4,7 +4,19 @@ EtherAnalyser is a REST API to access information about the current gas prices a
 
 ## Runing the API
 
-Before starting, you should retrieve your API Key from [EtherScan](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics), and add it in place of config.apiKeyToken
+Before starting, you should retrieve your API Key from [EtherScan](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics). 
+
+After doing that you need to change the name of .env.example to .env manually or run the following command in your terminal (Mac & Linux)
+
+```bash
+mv .env.example .env
+```
+
+Open .env, and include your API key in the following line
+
+```bash
+API_KEY=~
+```
 
 On your terminal, run this when you want to start the API
 
@@ -72,3 +84,9 @@ For this project, I have used node.js and express.js to build a REST API. When t
 Things that I need to improve on:
     - Error handling, sometimes EtherScan's API returns undefined json objects.
     - Query clients API Token from the link, rather than making them write theirs in the code.
+
+### Update 03/28/22
+- Removed config.js file and stored API keys in .env file
+- Added feature to wait until mysql server starts to start the program, which stops the program from crashing always in the first time.
+- Stored all sensitive information in the .env file, created a dummy file (.env.example) for deploying.
+- Handles errors emitted by the API.
