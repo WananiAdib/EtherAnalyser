@@ -2,6 +2,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 const axios = require("axios");
+require("dotenv").config();
 
 
 // Initialization of the API
@@ -9,16 +10,16 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-    console.log(`The API is up and running at ${port}`)
+    console.log(`The API is up and running at ${port}`);
 });
 
 
 // Create connection to MySql server
 const con = mysql.createConnection({
     host: "mysql_server",
-    user: "dan",
-    password: "secret",
-    database: "test_db",
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
     multipleStatements: true
 });
 
@@ -44,8 +45,7 @@ con.query(sql, function (err, result) {
 });
 
 // Receive data from Etherscan
-const config = require('./config.js')
-const url = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${config.apiKeyToken}`
+const url = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${process.env.API_KEY}`
 
 // Storing the data on the database every 500ms
 setInterval(() => {
@@ -57,10 +57,14 @@ setInterval(() => {
         '${info.ProposeGasPrice}',
         '${info.SafeGasPrice}',
         UNIX_TIMESTAMP())`;
-        con.query(sqlRow, function (err, result) {
-            if (err) throw err;
-            console.log(`Row inserted at ${Math.round(Date.now() / 1000)}`);
-        });
+        if (response.data.status == 0) {
+            console.log(`[${Math.round(Date.now() / 1000)}] Error curl with the following message "${response.data.result}"`)
+        } else {
+            con.query(sqlRow, function (err, result) {
+                if (err) throw err;
+                console.log(`[${Math.round(Date.now() / 1000)}] Row inserted`);
+            });
+        }
     })
     .catch(error => {
         console.log(error);

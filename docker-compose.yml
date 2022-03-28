@@ -1,7 +1,6 @@
 version: "3.8"
-
 services: 
-  app:
+  ether_analyser:
     build: 
       context: .
       dockerfile: Dockerfile
@@ -12,11 +11,15 @@ services:
       - '/app/node_modules'
     depends_on: 
       - mysql_server
-  
+    environment:
+      WAIT_HOSTS: mysql:3306
   mysql_server:
     image: mysql:8.0
+    hostname: mysql
+    ports:
+      - 3306
     environment: 
-      - MYSQL_DATABASE=test_db
-      - MYSQL_USER=dan
-      - MYSQL_PASSWORD=secret
-      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_USER=$MYSQL_USER
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
